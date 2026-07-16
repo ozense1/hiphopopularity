@@ -552,7 +552,7 @@ function renderTimeline() {
 
   const totalWidth = container.clientWidth;
   const totalHeight = container.clientHeight;
-  const margin = { top: 10, right: 40, bottom: 22, left: 32 };
+  const margin = { top: 26, right: 64, bottom: 22, left: 56 };
   const width = Math.max(50, totalWidth - margin.left - margin.right);
   const height = Math.max(50, totalHeight - margin.top - margin.bottom);
 
@@ -560,6 +560,27 @@ function renderTimeline() {
     .attr('viewBox', `0 0 ${totalWidth} ${totalHeight}`)
     .append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const legendItems = [
+    { label: 'Avg. popularity', color: 'var(--gold)', dashed: false },
+    { label: 'Lexical diversity', color: 'var(--red)', dashed: true },
+  ];
+  const legendG = svg.append('g').attr('transform', `translate(0,${-margin.top + 8})`);
+  let legendX = width;
+  legendItems.slice().reverse().forEach(item => {
+    const textWidth = item.label.length * 5.6 + 4;
+    legendX -= textWidth;
+    const groupX = legendX - 24;
+    legendG.append('line')
+      .attr('x1', groupX).attr('x2', groupX + 16).attr('y1', 0).attr('y2', 0)
+      .attr('stroke', item.color).attr('stroke-width', 2.5)
+      .attr('stroke-dasharray', item.dashed ? '5,3' : 'none');
+    legendG.append('text')
+      .attr('x', groupX + 22).attr('y', 3)
+      .style('font-size', '10.5px').style('fill', 'var(--ink-dim)')
+      .text(item.label);
+    legendX -= 24;
+  });
 
   const x = d3.scalePoint().domain(data.map(d => d.decade)).range([0, width]).padding(0.5);
   const yPop = d3.scaleLinear().domain([0, 100]).range([height, 0]);
@@ -574,6 +595,20 @@ function renderTimeline() {
   svg.append('g').attr('class', 'axis').call(d3.axisLeft(yPop).ticks(4));
   svg.append('g').attr('class', 'axis').attr('transform', `translate(${width},0)`)
     .call(d3.axisRight(yLex).ticks(4).tickFormat(d3.format('.2f')));
+
+  svg.append('text')
+    .attr('transform', 'rotate(-90)')
+    .attr('x', -height / 2).attr('y', -38)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '10px').style('fill', 'var(--gold)')
+    .text('Avg. popularity');
+
+  svg.append('text')
+    .attr('transform', 'rotate(-90)')
+    .attr('x', -height / 2).attr('y', width + 50)
+    .attr('text-anchor', 'middle')
+    .style('font-size', '10px').style('fill', 'var(--red)')
+    .text('Lexical diversity');
 
   svg.append('path').datum(data).attr('fill', 'var(--gold)').attr('fill-opacity', 0.12)
     .attr('d', d3.area().x(d => x(d.decade)).y0(height).y1(d => yPop(d.popularity)).curve(d3.curveMonotoneX));
