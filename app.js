@@ -21,6 +21,7 @@ function loadFromRawRows(rawRows, sourceLabel) {
   DATA = buildDataset(rawRows);
   document.getElementById('upload-status').textContent = sourceLabel;
   state.artist = 'ALL';
+  state.song = 'ALL';
   document.getElementById('artist-search-input').value = '';
   renderAll();
 }
@@ -132,6 +133,7 @@ function selectArtist(artist) {
   renderScatter();
   populateSongFilter();
   renderWordCloud();
+  renderRadarChart();
 }
 
 searchInput.addEventListener('focus', () => {
@@ -371,6 +373,7 @@ function populateSongFilter() {
 wcSongFilter.addEventListener('change', (e) => {
   state.song = e.target.value;
   renderWordCloud();
+  renderRadarChart();
 });
 
 // word cloud
@@ -472,6 +475,115 @@ function renderWordCloud() {
       .append('title')
       .text(d => `"${d.text}" · ${d.count} occurrence${d.count === 1 ? '' : 's'}`);
   }
+}
+
+// radar chart 
+function renderRadarChart() {
+  const container = document.getElementById('radar-chart');
+  container.innerHTML = '';
+  if (!DATA) return;
+
+  const sub = document.getElementById('radar-sub');
+  let profile;
+  if (state.artist === 'ALL') {
+    sub.textContent = 'All Hip-Hop Artists · All Songs';
+    profile = DATA.overall_radar;
+  } else if (state.song !== 'ALL') {
+    sub.textContent = `${state.artist} · ${state.song}`;
+    const key = `${state.song}|||${state.artist}`;
+    profile = DATA.song_radar[key];
+  } else {
+    sub.textContent = `${state.artist} · All Songs`;
+    profile = DATA.artist_radar[state.artist];
+  }
+
+  const features = DATA.radar_features;
+  const axes = features
+    .map(f => ({ key: f.key, label: f.label, value: profile ? profile[f.key] : null }))
+    .filter(a => a.value != null);
+
+  if (!axes.length) {
+    container.innerHTML = '<div class="wc-empty">No feature data available for this selection.</div>';
+    document.getElementById('radar-insight').innerHTML = '';
+    return;
+  }
+
+  const totalWidth = container.clientWidth;
+  const totalHeight = container.clientHeight;
+  if (!totalWidth || !totalHeight) return;
+
+  const cx = totalWidth / 2;
+  const cy = totalHeight / 2;
+  const labelPad = 34;
+  const radius = Math.max(30, Math.min(totalWidth, totalHeight) / 2 - labelPad);
+  const n = axes.length;
+  const angleFor = i => (Math.PI * 2 * i) / n - Math.PI / 2;
+  const rings = 4;
+
+  const svg = d3.select(container).append('svg')
+    .attr('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
+  const g = svg.append('g').attr('transform', `translate(${cx},${cy})`);
+
+  // grid rings
+  for (let ring = 1; ring <= rings; ring++) {
+    const r = (radius * ring) / rings;
+    const points = axes.map((_, i) => {
+      const a = angleFor(i);
+      return [r * Math.cos(a), r * Math.sin(a)];
+    });
+    g.append('polygon')
+      .attr('class', 'radar-grid-ring')
+      .attr('points', points.map(p => p.join(',')).join(' '));
+  }
+
+  // spokes + labels
+  axes.forEach((axis, i) => {
+    const a = angleFor(i);
+    const x2 = radius * Math.cos(a);
+    const y2 = radius * Math.sin(a);
+    g.append('line')
+      .attr('class', 'radar-spoke')
+      .attr('x1', 0).attr('y1', 0).attr('x2', x2).attr('y2', y2);
+
+    const lx = (radius + 16) * Math.cos(a);
+    const ly = (radius + 16) * Math.sin(a);
+    g.append('text')
+      .attr('class', 'radar-axis-label')
+      .attr('x', lx).attr('y', ly)
+      .attr('text-anchor', () => {
+        if (Math.abs(Math.cos(a)) < 0.15) return 'middle';
+        return Math.cos(a) > 0 ? 'start' : 'end';
+      })
+      .attr('dominant-baseline', () => {
+        if (Math.abs(Math.sin(a)) < 0.15) return 'middle';
+        return Math.sin(a) > 0 ? 'hanging' : 'auto';
+      })
+      .text(axis.label);
+  });
+
+  // data shape
+  const shapePoints = axes.map((axis, i) => {
+    const a = angleFor(i);
+    const r = radius * axis.value;
+    return { x: r * Math.cos(a), y: r * Math.sin(a), axis };
+  });
+
+  g.append('polygon')
+    .attr('class', 'radar-shape')
+    .attr('points', shapePoints.map(p => `${p.x},${p.y}`).join(' '));
+
+  g.selectAll('circle.radar-point').data(shapePoints).join('circle')
+    .attr('class', 'radar-point')
+    .attr('cx', d => d.x).attr('cy', d => d.y).attr('r', 4)
+    .on('mousemove', (event, d) => {
+      showTooltip(`<strong>${d.axis.label}</strong><br>${(d.axis.value * 100).toFixed(0)}% of scale`, event.clientX, event.clientY);
+    })
+    .on('mouseleave', hideTooltip);
+
+  const strongest = axes.reduce((a, b) => (b.value > a.value ? b : a));
+  const weakest = axes.reduce((a, b) => (b.value < a.value ? b : a));
+  document.getElementById('radar-insight').innerHTML =
+    `<strong>${strongest.label}</strong> is the most prominent trait; <strong>${weakest.label}</strong> is the least.`;
 }
 
 // correlation diverging bar
@@ -749,6 +861,7 @@ function renderAll() {
   populateSongFilter();
   renderScatter();
   renderWordCloud();
+  renderRadarChart();
   renderCorrChart();
   renderTimeline();
   renderExplicitChart();

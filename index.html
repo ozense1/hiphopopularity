@@ -5,8 +5,6 @@
 <title>What Makes Hip-Hop Popular? — A Data Reading</title>
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" type="image/png" href="logo.png">
-
-</head>
 </head>
 <body>
 
@@ -32,43 +30,59 @@
 </div>
 
 <div class="page active" id="page-1">
-  <div class="bignum-strip" id="bignum-strip"></div>
+  <div class="col col-left">
+    <div class="bignum-strip" id="bignum-strip"></div>
 
-  <section class="panel" id="panel-scatter">
-    <div class="panel-head">
-      <span class="panel-num">01</span>
-      <h2 class="panel-title">Genius Pageviews vs. Spotify Popularity</h2>
-    </div>
-    <div class="panel-sub">Genius pageviews (log) vs. Spotify popularity</div>
-    <div class="chart-area" id="scatter-chart">
-      <div class="zoom-controls">
-        <button class="zoom-btn" id="zoom-in-btn" title="Zoom in">+</button>
-        <button class="zoom-btn" id="zoom-out-btn" title="Zoom out">−</button>
-        <button class="zoom-btn" id="zoom-reset-btn" title="Reset zoom">⟲</button>
+    <section class="panel" id="panel-scatter">
+      <div class="panel-head">
+        <span class="panel-num">01</span>
+        <h2 class="panel-title">Genius Pageviews vs. Spotify Popularity</h2>
       </div>
-    </div>
-    <div class="insight-badge" tabindex="0">Insight
-      <div class="insight-popover" id="scatter-insight"></div>
-    </div>
-  </section>
+      <div class="panel-sub">Genius pageviews (log) vs. Spotify popularity</div>
+      <div class="chart-area" id="scatter-chart">
+        <div class="zoom-controls">
+          <button class="zoom-btn" id="zoom-in-btn" title="Zoom in">+</button>
+          <button class="zoom-btn" id="zoom-out-btn" title="Zoom out">−</button>
+          <button class="zoom-btn" id="zoom-reset-btn" title="Reset zoom">⟲</button>
+        </div>
+      </div>
+      <div class="insight-badge" tabindex="0">Insight
+        <div class="insight-popover" id="scatter-insight"></div>
+      </div>
+    </section>
+  </div>
 
-  <section class="panel" id="panel-wordcloud">
-    <div class="panel-head">
-      <span class="panel-num">02</span>
-      <h2 class="panel-title">Most Frequent Lyrics by Artist</h2>
-      <div class="wordcloud-controls">
-        <select id="wc-song-filter"></select>
+  <div class="col col-right">
+    <section class="panel" id="panel-radar">
+      <div class="panel-head">
+        <span class="panel-num">02</span>
+        <h2 class="panel-title">Audio & Lyric Profile</h2>
       </div>
-    </div>
-    <div class="panel-sub" id="wordcloud-sub">All Hip-Hop Artists · All Songs</div>
-    <div id="wordcloud-canvas"></div>
-  </section>
+      <div class="panel-sub" id="radar-sub">All Hip-Hop Artists · All Songs</div>
+      <div class="chart-area" id="radar-chart"></div>
+      <div class="insight-badge" tabindex="0">Insight
+        <div class="insight-popover" id="radar-insight"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-wordcloud">
+      <div class="panel-head">
+        <span class="panel-num">03</span>
+        <h2 class="panel-title">Most Frequent Lyrics by Artist</h2>
+        <div class="wordcloud-controls">
+          <select id="wc-song-filter"></select>
+        </div>
+      </div>
+      <div class="panel-sub" id="wordcloud-sub">All Hip-Hop Artists · All Songs</div>
+      <div id="wordcloud-canvas"></div>
+    </section>
+  </div>
 </div>
 
 <div class="page" id="page-2">
   <section class="panel" id="panel-corr">
     <div class="panel-head">
-      <span class="panel-num">03</span>
+      <span class="panel-num">04</span>
       <h2 class="panel-title">Audio & Lyric Features vs. Popularity</h2>
     </div>
     <div class="panel-sub">Correlation with popularity · All Hip-Hop (n = <span id="corr-n">–</span>)</div>
@@ -80,7 +94,7 @@
 
   <section class="panel" id="panel-timeline">
     <div class="panel-head">
-      <span class="panel-num">04</span>
+      <span class="panel-num">05</span>
       <h2 class="panel-title">Popularity & Lyric Complexity by Decade</h2>
     </div>
     <div class="panel-sub">By decade · All Hip-Hop Tracks</div>
@@ -92,7 +106,7 @@
 
   <section class="panel" id="panel-cards">
     <div class="panel-head">
-      <span class="panel-num">05</span>
+      <span class="panel-num">06</span>
       <h2 class="panel-title">Clean vs. Explicit: Avg. Popularity</h2>
     </div>
     <div class="panel-sub" id="explicit-sub">Explicit vs. Clean · Avg Popularity</div>
@@ -104,7 +118,7 @@
 
   <section class="panel" id="panel-subgenre">
     <div class="panel-head">
-      <span class="panel-num">06</span>
+      <span class="panel-num">07</span>
       <h2 class="panel-title">Avg. Popularity by Hip-Hop Subgenre</h2>
     </div>
     <div class="panel-sub">Grouped from Spotify genre tags · All Hip-Hop Tracks</div>

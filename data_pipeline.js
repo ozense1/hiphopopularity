@@ -147,6 +147,36 @@ function normalizeRow(row) {
   };
 }
 
+// radar chart 
+const RADAR_FEATURES = [
+  { key: 'danceability', label: 'Danceability', clamp: [0, 1] },
+  { key: 'energy', label: 'Energy', clamp: [0, 1] },
+  { key: 'valence', label: 'Valence', clamp: [0, 1] },
+  { key: 'speechiness', label: 'Speechiness', clamp: [0, 1] },
+  { key: 'acousticness', label: 'Acousticness', clamp: [0, 1] },
+  { key: 'loudness', label: 'Loudness', clamp: [-30, 0] },
+  { key: 'lexical_diversity', label: 'Lexical Diversity', clamp: [0, 1] },
+  { key: 'flesch_reading_ease', label: 'Reading Ease', clamp: [0, 100] },
+];
+
+function normalizeFeatureValue(value, clamp) {
+  if (value == null || Number.isNaN(value)) return null;
+  const [lo, hi] = clamp;
+  const clamped = Math.max(lo, Math.min(hi, value));
+  return (clamped - lo) / (hi - lo);
+}
+
+function computeRadarProfile(rows) {
+  const profile = {};
+  for (const feat of RADAR_FEATURES) {
+    const normalized = rows
+      .map(r => normalizeFeatureValue(r[feat.key], feat.clamp))
+      .filter(v => v != null);
+    profile[feat.key] = normalized.length ? mean(normalized) : null;
+  }
+  return profile;
+}
+
 function buildDataset(rawRows) {
   const rows = rawRows
     .map(normalizeRow)
@@ -226,6 +256,8 @@ function buildDataset(rawRows) {
     top_artist: topArtist,
   };
 
+  const overallRadar = computeRadarProfile(rows);
+
   // per-artist card
   const artistGroups = new Map();
   for (const r of rows) {
@@ -233,6 +265,7 @@ function buildDataset(rawRows) {
     artistGroups.get(r.principal_artist_name).push(r);
   }
   const artistCards = {};
+  const artistRadar = {};
   for (const [artist, group] of artistGroups.entries()) {
     artistCards[artist] = {
       n_songs: group.length,
@@ -241,6 +274,7 @@ function buildDataset(rawRows) {
       avg_danceability: Math.round((mean(group.map(r => r.danceability)) || 0) * 1000) / 1000,
       explicit_rate: Math.round((group.filter(r => r.explicit).length / group.length) * 100) / 100,
     };
+    artistRadar[artist] = computeRadarProfile(group);
   }
   const artistList = Array.from(artistGroups.keys()).sort((a, b) => a.localeCompare(b));
 
@@ -254,11 +288,13 @@ function buildDataset(rawRows) {
   }
 
   const songWordcloud = {};
+  const songRadar = {};
   const songListByArtist = {};
   for (const r of rows) {
     const key = `${r.track_name}|||${r.principal_artist_name}`;
     const wc = wordFrequency([r.lyrics_clean]);
     if (wc.length) songWordcloud[key] = wc;
+    songRadar[key] = computeRadarProfile([r]);
     if (!songListByArtist[r.principal_artist_name]) songListByArtist[r.principal_artist_name] = [];
     songListByArtist[r.principal_artist_name].push(r.track_name);
   }
@@ -294,10 +330,17 @@ function buildDataset(rawRows) {
     song_wordcloud: songWordcloud,
     song_list_by_artist: songListByArtist,
     subgenre_breakdown: subgenreBreakdown,
+    radar_features: RADAR_FEATURES,
+    overall_radar: overallRadar,
+    artist_radar: artistRadar,
+    song_radar: songRadar,
   };
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { buildDataset, tokenize, wordFrequency, pearsonCorrelation, normalizeRow, assignSubgenreBucket };
+  module.exports = {
+    buildDataset, tokenize, wordFrequency, pearsonCorrelation, normalizeRow, assignSubgenreBucket,
+    computeRadarProfile, normalizeFeatureValue, RADAR_FEATURES,
+  };
 }
 

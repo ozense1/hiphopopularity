@@ -215,18 +215,33 @@
 
   #page-1 {
     grid-template-columns: 1.5fr 1fr;
-    grid-template-rows: auto 1fr;
     gap: 10px;
   }
-  #page-1 .bignum-strip {
-    grid-column: 1 / 3;
-    grid-row: 1;
+  #page-1 .col {
+    min-height: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  #page-1 .col-left .bignum-strip {
+    flex-shrink: 0;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
-  #panel-scatter { grid-column: 1; grid-row: 2; }
-  #panel-wordcloud { grid-column: 2; grid-row: 2; }
+  #page-1 .col-left #panel-scatter {
+    flex: 1;
+    min-height: 0;
+  }
+  #page-1 .col-right #panel-radar {
+    flex: 1;
+    min-height: 0;
+  }
+  #page-1 .col-right #panel-wordcloud {
+    flex: 1;
+    min-height: 0;
+  }
 
   #page-2 {
     grid-template-columns: 1fr 1fr;
@@ -475,6 +490,29 @@
     transition: opacity 0.1s;
   }
   .tooltip strong { color: var(--gold); }
+
+  /* radar chart*/
+  .radar-axis-label {
+    font-size: 10.5px;
+    fill: var(--ink-dim);
+  }
+  .radar-grid-ring {
+    fill: none;
+    stroke: var(--line);
+  }
+  .radar-spoke {
+    stroke: var(--line);
+  }
+  .radar-shape {
+    fill: var(--gold);
+    fill-opacity: 0.18;
+    stroke: var(--gold);
+    stroke-width: 2;
+  }
+  .radar-point {
+    fill: var(--gold);
+    cursor: pointer;
+  }
 
   /* ---------- word cloud ---------- */
   #wordcloud-canvas {
