@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>What Makes Hip-Hop Popular? — A Data Reading</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-left">
+    <div class="eyebrow">Spotify × Genius</div>
+    <h1 class="headline">What Makes <em>Hip-Hop</em> Popular?</h1>
+  </div>
+  <div class="upload-control">
+    <span class="upload-status" id="upload-status">Using built-in dataset (2,723 tracks)</span>
+    <label class="upload-btn" for="csv-upload-input">Upload CSV</label>
+    <input type="file" id="csv-upload-input" accept=".csv">
+  </div>
+</header>
+
+<div class="filterbar" id="filterbar">
+  <span class="label">Filter by artist</span>
+  <div class="searchable-select" id="artist-search">
+    <input type="text" id="artist-search-input" placeholder="All Hip-Hop Artists" autocomplete="off">
+    <div class="options-list" id="artist-options-list"></div>
+  </div>
+  <span class="filter-tag" id="filter-tag"></span>
+</div>
+
+<div class="page active" id="page-1">
+  <div class="bignum-strip" id="bignum-strip"></div>
+
+  <section class="panel" id="panel-scatter">
+    <div class="panel-head">
+      <span class="panel-num">01</span>
+      <h2 class="panel-title">Genius Pageviews vs. Spotify Popularity</h2>
+    </div>
+    <div class="panel-sub">Genius pageviews (log) vs. Spotify popularity</div>
+    <div class="chart-area" id="scatter-chart">
+      <div class="zoom-controls">
+        <button class="zoom-btn" id="zoom-in-btn" title="Zoom in">+</button>
+        <button class="zoom-btn" id="zoom-out-btn" title="Zoom out">−</button>
+        <button class="zoom-btn" id="zoom-reset-btn" title="Reset zoom">⟲</button>
+      </div>
+    </div>
+    <div class="insight-badge" tabindex="0">Insight
+      <div class="insight-popover" id="scatter-insight"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-wordcloud">
+    <div class="panel-head">
+      <span class="panel-num">02</span>
+      <h2 class="panel-title">Most Frequent Lyrics by Artist</h2>
+      <div class="wordcloud-controls">
+        <select id="wc-song-filter"></select>
+      </div>
+    </div>
+    <div class="panel-sub" id="wordcloud-sub">All Hip-Hop Artists · All Songs</div>
+    <div id="wordcloud-canvas"></div>
+  </section>
+</div>
+
+<div class="page" id="page-2">
+  <section class="panel" id="panel-corr">
+    <div class="panel-head">
+      <span class="panel-num">03</span>
+      <h2 class="panel-title">Audio & Lyric Features vs. Popularity</h2>
+    </div>
+    <div class="panel-sub">Correlation with popularity · All Hip-Hop (n = <span id="corr-n">–</span>)</div>
+    <div class="chart-area" id="corr-chart"></div>
+    <div class="insight-badge" tabindex="0">Insight
+      <div class="insight-popover" id="corr-insight"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-timeline">
+    <div class="panel-head">
+      <span class="panel-num">04</span>
+      <h2 class="panel-title">Popularity & Lyric Complexity by Decade</h2>
+    </div>
+    <div class="panel-sub">By decade · All Hip-Hop Tracks</div>
+    <div class="chart-area" id="timeline-chart"></div>
+    <div class="insight-badge" tabindex="0">Insight
+      <div class="insight-popover" id="timeline-insight"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-cards">
+    <div class="panel-head">
+      <span class="panel-num">05</span>
+      <h2 class="panel-title">Clean vs. Explicit: Avg. Popularity</h2>
+    </div>
+    <div class="panel-sub" id="explicit-sub">Explicit vs. Clean · Avg Popularity</div>
+    <div class="chart-area" id="explicit-chart"></div>
+    <div class="insight-badge" tabindex="0">Insight
+      <div class="insight-popover" id="cards-insight"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-subgenre">
+    <div class="panel-head">
+      <span class="panel-num">06</span>
+      <h2 class="panel-title">Avg. Popularity by Hip-Hop Subgenre</h2>
+    </div>
+    <div class="panel-sub">Grouped from Spotify genre tags · All Hip-Hop Tracks</div>
+    <div class="chart-area" id="subgenre-chart"></div>
+    <div class="insight-badge" tabindex="0">Insight
+      <div class="insight-popover" id="subgenre-insight"></div>
+    </div>
+  </section>
+</div>
+
+<div class="tabbar">
+  <button class="tab-btn active" data-page="page-1">Overview</button>
+  <button class="tab-btn" data-page="page-2">Deep Dive</button>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.7/d3.layout.cloud.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.5.4/papaparse.min.js"></script>
+<script src="data_pipeline.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
